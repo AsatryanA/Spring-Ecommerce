@@ -1,7 +1,7 @@
 package com.example.springEcommerce.model.entity;
 
 
-import com.example.springEcommerce.util.Gender;
+import com.example.springEcommerce.util.enums.Gender;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,11 +37,14 @@ public class UserEntity extends BaseEntity {
     private String password;
     @Column(nullable = false, unique = true)
     private String phone;
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
     private int age;
     private String code;
+    @Column(name = "is_active")
     private boolean isActive;
     @Enumerated(EnumType.STRING)
     private Gender gender;
+    @Column(name = "is_verified")
     private boolean isVerified;
 }
