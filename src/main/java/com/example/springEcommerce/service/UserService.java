@@ -10,9 +10,7 @@ import java.util.List;
 
 public interface UserService {
 
-    UserResponseDTO register(UserRequestDTO userRequestDTO);
 
-    UserResponseDTO login(String username, String password);
 
     UserResponseDTO getById(Long id);
 
@@ -21,4 +19,6 @@ public interface UserService {
     void delete(Long id);
     UserResponseDTO update(UserUpdateDto userUpdateDto);
     UserResponseDTO getByEmail(String email);
+
+    void verify(String email, String code);
 }

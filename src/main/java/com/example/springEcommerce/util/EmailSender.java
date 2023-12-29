@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class EmailSender {
 
 
-    private final JavaMailSender mailSender;
+    private final JavaMailSender javaMailSender;
 
     public void sendSimpleMessage(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -18,7 +18,7 @@ public class EmailSender {
         message.setSubject(subject);
         message.setText(text);
         message.setFrom("testfortest891@gmail.com");
-        mailSender.send(message);
+        javaMailSender.send(message);
 
     }
 

@@ -2,6 +2,7 @@ package com.example.springEcommerce.model.dto;
 
 import com.example.springEcommerce.util.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -12,14 +13,16 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class UserRequestDTO {
-    @NotNull
-    @NotBlank
     private String firstName;
+    private String lastName;
     @NotNull
     @NotBlank
-    private String lastName;
     private String email;
+    @NotNull
+    @NotBlank
     private String password;
+    @NotNull
+    @NotBlank
     private String phone;
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDate dateOfBirth;

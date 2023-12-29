@@ -2,6 +2,7 @@ package com.example.springEcommerce.model.entity;
 
 
 import com.example.springEcommerce.util.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,8 +14,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 
 @Getter
@@ -25,7 +29,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class UserEntity extends BaseEntity {
+public class UserEntity extends BaseEntity implements UserDetails {
 
     @Column(name = "first_name")
     private String firstName;
@@ -38,6 +42,7 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String phone;
     @Column(name = "date_of_birth")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
     private int age;
     private String code;
@@ -47,4 +52,35 @@ public class UserEntity extends BaseEntity {
     private Gender gender;
     @Column(name = "is_verified")
     private boolean isVerified;
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

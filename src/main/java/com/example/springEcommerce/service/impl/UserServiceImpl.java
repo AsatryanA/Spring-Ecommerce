@@ -1,7 +1,7 @@
 package com.example.springEcommerce.service.impl;
 
 
-import com.example.springEcommerce.exception.UserNotFoundException;
+import com.example.springEcommerce.exception.ResourceNotFoundException;
 import com.example.springEcommerce.mapper.UserMapper;
 import com.example.springEcommerce.model.dto.UserRequestDTO;
 import com.example.springEcommerce.model.dto.UserResponseDTO;
@@ -16,8 +16,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -27,31 +30,14 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final EmailSender emailSender;
 
-    @Override
-    @Transactional
-    public UserResponseDTO register(UserRequestDTO userRequestDTO) {
-        var userEntity = userMapper.toUser(userRequestDTO);
-        setUserData(userRequestDTO, userEntity);
-        emailSender.sendSimpleMessage(userEntity.getEmail(),"Vareification Code",userEntity.getCode());
-        return userMapper.toUserResponseDTO(userRepository.save(userEntity));
-    }
 
-    @Override
-    @Transactional
-    public UserResponseDTO login(String email, String password) {
-        var userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User by email %s not found", email)));
-        if (userEntity.getPassword().equals(password)) {
-            return userMapper.toUserResponseDTO(userEntity);
-        }
-        throw new RuntimeException("Wrong username or password");
-    }
+
 
     @Override
     @Transactional(readOnly = true)
     public UserResponseDTO getById(Long id) {
         var userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("UserEntity not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("UserEntity not found"));
         return userMapper.toUserResponseDTO(userEntity);
     }
 
@@ -65,8 +51,20 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponseDTO getByEmail(String email) {
         var userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User by email %s not found", email)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User by email %s not found", email)));
         return userMapper.toUserResponseDTO(userEntity);
+    }
+
+    @Override
+    @Transactional
+    public void verify(String email, String code) {
+        var userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!Objects.equals(userEntity.getCode(), code))   {
+            throw new IllegalArgumentException("Wrong Code number, Please try again")  ;
+        }
+         userEntity.setVerified(true);
+        userRepository.save(userEntity);
     }
 
     @Override
@@ -82,14 +80,5 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    private void setUserData(UserRequestDTO userRequestDTO, UserEntity userEntity) {
-        userEntity.setPassword(MD5Encoder.encode(userRequestDTO.getPassword()));
-        if (userRequestDTO.getDateOfBirth() != null) {
-            var age = LocalDate.now().getYear() - userRequestDTO.getDateOfBirth().getYear();
-            userEntity.setAge(age);
-        }
-        userEntity.setCode(RandomGenerator.generateCode(6));
-        userEntity.setVerified(false);
-        userEntity.setActive(false);
-    }
+
 }
