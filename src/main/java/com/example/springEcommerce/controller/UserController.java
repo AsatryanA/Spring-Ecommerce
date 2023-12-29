@@ -4,6 +4,7 @@ import com.example.springEcommerce.model.dto.UserRequestDTO;
 import com.example.springEcommerce.model.dto.UserResponseDTO;
 import com.example.springEcommerce.model.dto.UserUpdateDto;
 import com.example.springEcommerce.service.UserService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -11,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,7 @@ public class UserController {
 
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     ResponseEntity<UserResponseDTO> getById(@PathVariable @Positive  Long id) {
         return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
     }

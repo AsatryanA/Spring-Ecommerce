@@ -23,9 +23,10 @@ public class JwtProvider {
     @Value("${expiration}")
     private long accessTokenExpirationMs;
 
-    public String generateAccessToken(Long userId, String username) {
+    public String generateAccessToken(Long userId, String username, String role) {
         var claims = Jwts.claims().setSubject(username);
         claims.put("userId", userId);
+        claims.put("role", role);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date())
@@ -35,10 +36,7 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String getSubject(String token) {
-        log.info("get subject");
-        return parseJwtClaims(token).getSubject();
-    }
+
 
     private Claims parseJwtClaims(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
@@ -55,10 +53,18 @@ public class JwtProvider {
             throw new AuthenticationCredentialsNotFoundException("JWT was expired or incorrect: " + e.getMessage());
         }
     }
+    public String getSubject(String token) {
+        log.info("get subject");
+        return parseJwtClaims(token).getSubject();
+    }
 
     public Long getId(String token) {
-        log.info("get id");
         Claims body = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
         return body.get("userId", Long.class);
+    }
+
+    public String getRole(String token) {
+        Claims body = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+        return body.get("role", String.class);
     }
 }
